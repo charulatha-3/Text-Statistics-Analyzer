@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Statistics Analyzer</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+}
+
+header {
+    background: #172033;
+    color: white;
+    padding: 22px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.badge {
+    background: #29344d;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.container {
+    width: 86%;
+    max-width: 1200px;
+    margin: 35px auto;
+}
+
+.hero {
+    margin-bottom: 25px;
+}
+
+.hero h1 {
+    font-size: 34px;
+    margin-bottom: 8px;
+}
+
+.hero p {
+    color: #727b8e;
+}
+
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 25px rgba(20, 30, 50, 0.06);
+}
+
+.card-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+textarea {
+    width: 100%;
+    height: 260px;
+    resize: none;
+    border: 1px solid #dfe4ed;
+    border-radius: 13px;
+    padding: 16px;
+    outline: none;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #30394b;
+}
+
+textarea:focus {
+    border-color: #536dfe;
+}
+
+.counter {
+    margin-top: 8px;
+    text-align: right;
+    color: #8a92a3;
+    font-size: 12px;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 17px;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+}
+
+.analyze {
+    background: #536dfe;
+    color: white;
+    flex: 1;
+}
+
+.analyze:hover {
+    background: #4058e8;
+}
+
+.clear {
+    background: #edf0f5;
+    color: #4c5668;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 13px;
+}
+
+.stat {
+    padding: 17px;
+    background: #f7f8fb;
+    border: 1px solid #edf0f4;
+    border-radius: 13px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #7e8798;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.stat-icon {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.full-card {
+    margin-top: 22px;
+}
+
+.analysis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.metric {
+    margin-bottom: 18px;
+}
+
+.metric-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.bar {
+    width: 100%;
+    height: 9px;
+    background: #edf0f5;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.fill {
+    height: 100%;
+    width: 0%;
+    background: #536dfe;
+    border-radius: 20px;
+    transition: width 0.5s ease;
+}
+
+.words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.word {
+    background: #eef1ff;
+    color: #465bd1;
+    padding: 8px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.history-item {
+    border: 1px solid #edf0f4;
+    padding: 13px;
+    border-radius: 11px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    font-size: 12px;
+}
+
+.history-text {
+    color: #626c7e;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.history-time {
+    color: #9aa1ae;
+    white-space: nowrap;
+}
+
+.empty {
+    color: #9aa1ae;
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+}
+
+footer {
+    text-align: center;
+    color: #8d95a5;
+    padding: 30px;
+    font-size: 12px;
+}
+
+@media(max-width: 800px) {
+    .main-grid,
+    .analysis-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        width: 92%;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    header {
+        padding: 20px 5%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">TextMetrics 📊</div>
+    <div class="badge">Application 3 • NLP</div>
+</header>
+
+<div class="container">
+
+    <div class="hero">
+        <h1>Text Statistics Analyzer</h1>
+        <p>Understand your text through detailed statistics and analysis.</p>
+    </div>
+
+    <div class="main-grid">
+
+        <div class="card">
+
+            <div class="card-title">Enter Your Text</div>
+
+            <textarea
+                id="textInput"
+                maxlength="10000"
+                placeholder="Paste or type your text here..."></textarea>
+
+            <div class="counter">
+                <span id="charCount">0</span>/10000 characters
+            </div>
+
+            <div class="buttons">
+
+                <button class="analyze" onclick="analyzeText()">
+                    Analyze Text
+                </button>
+
+                <button class="clear" onclick="clearText()">
+                    Clear
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-title">Text Overview</div>
+
+            <div class="stats-grid">
+
+                <div class="stat">
+                    <div class="stat-icon">🔤</div>
+                    <div class="stat-label">Characters</div>
+                    <div class="stat-value" id="characters">0</div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-label">Words</div>
+                    <div class="stat-value" id="words">0</div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-icon">📄</div>
+                    <div class="stat-label">Sentences</div>
+                    <div class="stat-value" id="sentences">0</div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-icon">📌</div>
+                    <div class="stat-label">Paragraphs</div>
+                    <div class="stat-value" id="paragraphs">0</div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-icon">🔢</div>
+                    <div class="stat-label">Numbers</div>
+                    <div class="stat-value" id="numbers">0</div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-icon">⏱️</div>
+                    <div class="stat-label">Reading Time</div>
+                    <div class="stat-value" id="readingTime">0 min</div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card full-card">
+
+        <div class="card-title">Detailed Analysis</div>
+
+        <div class="analysis-grid">
+
+            <div>
+
+                <div class="metric">
+
+                    <div class="metric-head">
+                        <span>Average Word Length</span>
+                        <span id="avgWord">0</span>
+                    </div>
+
+                    <div class="bar">
+                        <div class="fill" id="avgBar"></div>
+                    </div>
+
+                </div>
+
+                <div class="metric">
+
+                    <div class="metric-head">
+                        <span>Average Sentence Length</span>
+                        <span id="avgSentence">0 words</span>
+                    </div>
+
+                    <div class="bar">
+                        <div class="fill" id="sentenceBar"></div>
+                    </div>
+
+                </div>
+
+                <div class="metric">
+
+                    <div class="metric-head">
+                        <span>Letters</span>
+                        <span id="letters">0</span>
+                    </div>
+
+                    <div class="bar">
+                        <div class="fill" id="letterBar"></div>
+                    </div>
+
+                </div>
+
+                <div class="metric">
+
+                    <div class="metric-head">
+                        <span>Spaces</span>
+                        <span id="spaces">0</span>
+                    </div>
+
+                    <div class="bar">
+                        <div class="fill" id="spaceBar"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="card-title">
+                    Most Frequent Words
+                </div>
+
+                <div class="words" id="frequentWords">
+                    <span class="word">No data yet</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card full-card">
+
+        <div class="card-title">
+            Recent Analysis
+        </div>
+
+        <div id="history">
+            <div class="empty">
+                No analysis performed yet.
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    Text & Speech Analysis Series • Application 3
+</footer>
+
+<script>
+
+const textInput = document.getElementById("textInput");
+
+textInput.addEventListener("input", function() {
+    document.getElementById("charCount").textContent =
+        this.value.length;
+});
+
+function analyzeText() {
+
+    const text = textInput.value.trim();
+
+    if (!text) {
+        alert("Please enter some text first.");
+        return;
+    }
+
+    const characters = text.length;
+
+    const words = text
+        .match(/\b[\w'-]+\b/g) || [];
+
+    const wordCount = words.length;
+
+    const sentences =
+        text.match(/[.!?]+(?=\s|$)/g) || [];
+
+    const sentenceCount =
+        sentenceCountSafe(sentences, text);
+
+    const paragraphs =
+        text.split(/\n\s*\n/).filter(p => p.trim()).length;
+
+    const numbers =
+        text.match(/\b\d+(?:\.\d+)?\b/g) || [];
+
+    const numberCount = numbers.length;
+
+    const letters =
+        text.match(/[A-Za-z]/g) || [];
+
+    const letterCount = letters.length;
+
+    const spaces =
+        text.match(/\s/g) || [];
+
+    const spaceCount = spaces.length;
+
+    const readingMinutes =
+        wordCount === 0
+        ? 0
+        : Math.max(1, Math.ceil(wordCount / 200));
+
+    let totalWordLength = 0;
+
+    words.forEach(word => {
+        totalWordLength += word.replace(/[^A-Za-z]/g, "").length;
+    });
+
+    const averageWordLength =
+        wordCount === 0
+        ? 0
+        : (totalWordLength / wordCount).toFixed(1);
+
+    const averageSentenceLength =
+        sentenceCount === 0
+        ? 0
+        : (wordCount / sentenceCount).toFixed(1);
+
+    document.getElementById("characters").textContent =
+        characters;
+
+    document.getElementById("words").textContent =
+        wordCount;
+
+    document.getElementById("sentences").textContent =
+        sentenceCount;
+
+    document.getElementById("paragraphs").textContent =
+        paragraphs;
+
+    document.getElementById("numbers").textContent =
+        numberCount;
+
+    document.getElementById("readingTime").textContent =
+        readingMinutes + " min";
+
+    document.getElementById("avgWord").textContent =
+        averageWordLength;
+
+    document.getElementById("avgSentence").textContent =
+        averageSentenceLength + " words";
+
+    document.getElementById("letters").textContent =
+        letterCount;
+
+    document.getElementById("spaces").textContent =
+        spaceCount;
+
+    document.getElementById("avgBar").style.width =
+        Math.min(100, averageWordLength * 10) + "%";
+
+    document.getElementById("sentenceBar").style.width =
+        Math.min(100, averageSentenceLength * 4) + "%";
+
+    document.getElementById("letterBar").style.width =
+        characters
+        ? Math.min(100, (letterCount / characters) * 100) + "%"
+        : "0%";
+
+    document.getElementById("spaceBar").style.width =
+        characters
+        ? Math.min(100, (spaceCount / characters) * 100) + "%"
+        : "0%";
+
+    displayFrequentWords(words);
+
+    saveHistory(text, wordCount, sentenceCount);
+}
+
+function sentenceCountSafe(sentences, text) {
+
+    if (!text.trim()) {
+        return 0;
+    }
+
+    if (sentences.length > 0) {
+        return sentences.length;
+    }
+
+    return 1;
+}
+
+function displayFrequentWords(words) {
+
+    const container =
+        document.getElementById("frequentWords");
+
+    const stopWords = new Set([
+        "the", "is", "a", "an", "and",
+        "or", "of", "to", "in", "on",
+        "for", "with", "this", "that",
+        "it", "as", "are", "was",
+        "were", "be", "by", "from",
+        "at", "has", "have", "had",
+        "i", "you", "he", "she",
+        "we", "they", "my", "your",
+        "our", "their", "but", "not"
+    ]);
+
+    const frequency = {};
+
+    words.forEach(word => {
+
+        const clean =
+            word.toLowerCase()
+                .replace(/[^a-z0-9'-]/g, "");
+
+        if (
+            clean &&
+            !stopWords.has(clean)
+        ) {
+            frequency[clean] =
+                (frequency[clean] || 0) + 1;
+        }
+
+    });
+
+    const sortedWords =
+        Object.entries(frequency)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10);
+
+    if (sortedWords.length === 0) {
+
+        container.innerHTML =
+            '<span class="word">No meaningful words found</span>';
+
+        return;
+    }
+
+    container.innerHTML =
+        sortedWords.map(([word, count]) => {
+
+            return `
+                <span class="word">
+                    ${escapeHTML(word)} ×${count}
+                </span>
+            `;
+
+        }).join("");
+}
+
+function saveHistory(text, wordCount, sentenceCount) {
+
+    let history =
+        JSON.parse(
+            localStorage.getItem("textStatsHistory") || "[]"
+        );
+
+    history.unshift({
+        text: text,
+        words: wordCount,
+        sentences: sentenceCount,
+        time: new Date().toLocaleString()
+    });
+
+    history =
+        history.slice(0, 5);
+
+    localStorage.setItem(
+        "textStatsHistory",
+        JSON.stringify(history)
+    );
+
+    displayHistory();
+}
+
+function displayHistory() {
+
+    const container =
+        document.getElementById("history");
+
+    const history =
+        JSON.parse(
+            localStorage.getItem("textStatsHistory") || "[]"
+        );
+
+    if (history.length === 0) {
+
+        container.innerHTML =
+            '<div class="empty">No analysis performed yet.</div>';
+
+        return;
+    }
+
+    container.innerHTML =
+        history.map(item => {
+
+            return `
+                <div class="history-item">
+
+                    <div class="history-text">
+                        ${escapeHTML(item.text)}
+                    </div>
+
+                    <div>
+                        ${item.words} words
+                        •
+                        ${item.sentences} sentences
+                    </div>
+
+                    <div class="history-time">
+                        ${item.time}
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+}
+
+function clearText() {
+
+    textInput.value = "";
+
+    document.getElementById("charCount").textContent = "0";
+
+    document.getElementById("characters").textContent = "0";
+    document.getElementById("words").textContent = "0";
+    document.getElementById("sentences").textContent = "0";
+    document.getElementById("paragraphs").textContent = "0";
+    document.getElementById("numbers").textContent = "0";
+    document.getElementById("readingTime").textContent = "0 min";
+
+    document.getElementById("avgWord").textContent = "0";
+    document.getElementById("avgSentence").textContent = "0 words";
+    document.getElementById("letters").textContent = "0";
+    document.getElementById("spaces").textContent = "0";
+
+    document.getElementById("avgBar").style.width = "0%";
+    document.getElementById("sentenceBar").style.width = "0%";
+    document.getElementById("letterBar").style.width = "0%";
+    document.getElementById("spaceBar").style.width = "0%";
+
+    document.getElementById("frequentWords").innerHTML =
+        '<span class="word">No data yet</span>';
+}
+
+function escapeHTML(text) {
+
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+displayHistory();
+
+</script>
+
+</body>
+</html>
